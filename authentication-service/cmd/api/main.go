@@ -1,7 +1,6 @@
 package main
 
 import (
-	"authentication/data"
 	"database/sql"
 	"fmt"
 	"log"
@@ -9,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/garvelj/go-micros/authentication/data"
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"

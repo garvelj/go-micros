@@ -1,4 +1,4 @@
-module broker
+module github.com/garvelj/go-micros/broker-service
 
 go 1.22.2
 

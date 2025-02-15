@@ -1,5 +1,6 @@
 package main
 
+//ovo se moze odvojiti u poseban pkg, pa da se importuje, imamo vec 2 ista ovakva fajla
 import (
 	"encoding/json"
 	"errors"
