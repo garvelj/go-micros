@@ -51,7 +51,7 @@ func main() {
 	}
 
 	//start server
-	go app.serve()
+	app.serve()
 }
 
 func (app *Config) serve() {
