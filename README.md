@@ -7,5 +7,6 @@ The project can be ran through the make commands
   - This will build the project and start it
 3. Run the front end through make start
 4. Go to localhost on your browser and start clicking :)
-5. To stop the frontend just use CMD+C
+5. To stop the frontend use make stop
 6. To stop the services use make down
+7. To access the mailhog first start the project than go to localhost:8025
