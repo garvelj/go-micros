@@ -27,6 +27,7 @@ package main
 
 import (
 	"fmt"
+	"listenerApp/event"
 	"log"
 	"math"
 	"os"
@@ -52,8 +53,16 @@ func main() {
 	// We get it from the queue
 
 	// Create a consumer
+	consumer, err := event.NewConsumer(rabbitConn)
+	if err != nil {
+		panic(err)
+	}
 
 	// Watch the queue and consume the events
+	err = consumer.Listen([]string{"log.INFO", "log.WARNING", "log.ERROR"})
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // So we obviously we have to add the listener service to our docker compose file
@@ -70,7 +79,8 @@ func connect() (*amqp.Connection, error) {
 
 	for {
 		// Attempt connection
-		c, err := amqp.Dial("amqp://guest:guest@localhost")
+		// this has to match what is in the docker-compose file
+		c, err := amqp.Dial("amqp://guest:guest@rabbitmq")
 		if err != nil {
 
 			// if error occured -> print and increase count

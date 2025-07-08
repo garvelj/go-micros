@@ -93,9 +93,16 @@ services:
     image: 'rabbitmq:4.0.9-alpine'
     ports:
       - "5672:5672"
-      - "15672:15672"  # Dodaj ovo za pristup web UI
+    deploy:
+      mode: replicated
+      replicas: 1
     volumes:
       - ./db-data/rabbitmq/:/var/lib/rabbitmq/
-    environment:
-      RABBITMQ_DEFAULT_USER: user
-      RABBITMQ_DEFAULT_PASS: password
+
+  listener-service:
+    build: 
+      context: ./../listener-service
+      dockerfile: ./../listener-service/listener-service.dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1

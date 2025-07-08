@@ -1313,3 +1313,4 @@ project/db-data/rabbitmq/mnesia/rabbit@2c422b6f36ec/msg_stores/vhosts/628WB79CIF
 project/db-data/rabbitmq/mnesia/rabbit@2c422b6f36ec/quorum/rabbit@2c422b6f36ec/00000001.wal
 project/db-data/rabbitmq/mnesia/rabbit@2c422b6f36ec/quorum/rabbit@2c422b6f36ec/meta.dets
 project/db-data/rabbitmq/mnesia/rabbit@2c422b6f36ec/quorum/rabbit@2c422b6f36ec/names.dets
+project/db-data/

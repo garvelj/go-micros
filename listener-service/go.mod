@@ -1,4 +1,4 @@
-module listener
+module listenerApp
 
 go 1.22.2
 
