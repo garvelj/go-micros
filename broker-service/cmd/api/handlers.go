@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/garvelj/go-micros/broker-service/event"
 )
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +31,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, RequestPayload.Auth)
 	case "log":
-		app.logItem(w, RequestPayload.Log)
+		app.logEventViaRabbit(w, RequestPayload.Log)
 	case "mail":
 		app.sendMail(w, RequestPayload.Mail)
 	default:
@@ -183,4 +185,37 @@ func (app *Config) authenticate(w http.ResponseWriter, auth AuthPayload) {
 	payload.Data = jsonFromService.Data
 
 	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) logEventViaRabbit(w http.ResponseWriter, l LogPayload) {
+	if err := app.pushToQueue(l.Name, l.Data); err != nil {
+		app.errJSON(w, err)
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "Logged via RabbitMQ!"
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) pushToQueue(name string, msg string) error {
+	emitter, err := event.NewEventEmitter(app.Rabbit)
+	if err != nil {
+		return err
+	}
+
+	payload := LogPayload{
+		Name: name,
+		Data: msg,
+	}
+
+	j, _ := json.MarshalIndent(payload, "", "\t")
+
+	err = emitter.Push(string(j), "log.INFO")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
