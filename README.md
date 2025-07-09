@@ -23,3 +23,18 @@ rm -rf ./db-data/rabbitmq/
 ```
 And then try to build docker compose again, it will most probably solve it.
 
+
+Same goes for Mongo data. 
+It can happen that Mongo crashes after some seconds being up. 
+It usually helps to remove the db data. 
+Maybe removing whole db-data folder is a better option if you're starting the service after a while, so when it's being built, it will add all the necessary files. 
+
+So, similarly it goes like: 
+```
+rm -rf ./db-data/
+```
+
+*NOTE*: 
+Be aware that if you're starting the service for the first time, you should execute the SQL queries located in the authentication-service/scripts/userScript.sql file. 
+
+This will create your users table with one user entry which is used for testing the authentication service. 
