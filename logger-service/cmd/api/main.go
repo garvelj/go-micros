@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/rpc"
 	"time"
 
 	"github.com/garvelj/go-micros/logger-service/data"
@@ -50,17 +52,25 @@ func main() {
 		Models: data.New(client),
 	}
 
-	//start server
-	app.serve()
-}
+	// register the RPC server
+	err = rpc.Register(new(RPCServer))
+	if err != nil {
+		panic(fmt.Sprintf("error registering RPC Server: %s", err))
+	}
 
-func (app *Config) serve() {
+	//in order for this to accept RPC requests
+	// we have to register our RPC server
+	// That's the code above rpc.Register()
+	// Without this, the Listen would not work!
+	go app.RPCListen()
+
+	//start server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic("error on Listen and Serve; logger service: ", err)
 	}
@@ -82,4 +92,25 @@ func connectToMongo() (*mongo.Client, error) {
 	}
 
 	return c, nil
+}
+
+func (app *Config) RPCListen() error {
+	log.Println("Starting RPC server on port: ", rpcPort)
+
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", rpcPort))
+	if err != nil {
+		return err
+	}
+	defer listen.Close()
+
+	for {
+		rpcConn, err := listen.Accept()
+		if err != nil {
+			continue
+		}
+
+		// func
+		go rpc.ServeConn(rpcConn)
+	}
+
 }

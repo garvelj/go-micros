@@ -38,3 +38,12 @@ rm -rf ./db-data/
 Be aware that if you're starting the service for the first time, you should execute the SQL queries located in the authentication-service/scripts/userScript.sql file. 
 
 This will create your users table with one user entry which is used for testing the authentication service. 
+
+
+In Go, if you're to use RPC, it has to be both applications written in Go. 
+For example, we would want to implement the RPC protocol to be used between the Broker and the Logger service. This would not work if the Broker is written in Go, and then Logger to be written in Java, or Rust or anything else. 
+
+Luckily for us, we have everything written in Go :)
+
+Now with gRPC that is not the case.
+You can have services written in various languages but have them communicate via gRPC. 

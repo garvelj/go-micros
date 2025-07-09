@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/rpc"
 
 	"github.com/garvelj/go-micros/broker-service/event"
 )
@@ -31,7 +32,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, RequestPayload.Auth)
 	case "log":
-		app.logEventViaRabbit(w, RequestPayload.Log)
+		// app.logEventViaRabbit(w, RequestPayload.Log)
+		app.logItemViaRPC(w, RequestPayload.Log)
 	case "mail":
 		app.sendMail(w, RequestPayload.Mail)
 	default:
@@ -218,4 +220,47 @@ func (app *Config) pushToQueue(name string, msg string) error {
 	}
 
 	return nil
+}
+
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
+// Here we're declaring a new func which is going to be used instead of the previous one
+func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+	if err != nil {
+		app.errJSON(w, err)
+		return
+	}
+
+	rpcPayload := RPCPayload{
+		Name: l.Name,
+		Data: l.Data,
+	}
+
+	var result string
+
+	// First argument is the RPC server instance we've created on the remote server
+	// And it's method we're calling.
+	// Take into consideration that the method has to begin with a capital letter
+
+	// Second argument is the data the function recieves
+	// Note that the type of the payload has to be the same as the one declared on the server side
+
+	// Thir argument is for the response of the remote method we're calling.
+	// There will be the result of the method written.
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		app.errJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: result,
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
